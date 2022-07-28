@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:exemplo/artist_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,17 +36,20 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Top $limit artistas"),
-        backgroundColor: Colors.blueGrey[900],
+        backgroundColor: Colors.blueGrey[700],
       ),
       body: FutureBuilder(
         future: getListArtists(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Scaffold(
-              body: Column(
-                children: [
-                  builderGridView(context, snapshot),
-                ],
+              body: Container(
+                color: Colors.blueGrey[900],
+                child: Column(
+                  children: [
+                    builderGridView(context, snapshot),
+                  ],
+                ),
               ),
             );
           } else if (snapshot.connectionState == ConnectionState.none ||
@@ -69,6 +73,13 @@ Widget builderGridView(BuildContext context, AsyncSnapshot snapshot) {
     return snapshot.data["art"]["day"]["internacional"][index]["pic_medium"];
   }
 
+  String retornaViews(int index) {
+    return snapshot.data["art"]["day"]["internacional"][index]["views"];
+  }
+
+  var a = snapshot.data["art"]["day"]["internacional"][0]["rank"];
+
+  print(a);
   return Expanded(
     child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -76,28 +87,49 @@ Widget builderGridView(BuildContext context, AsyncSnapshot snapshot) {
         ),
         itemCount: 30,
         itemBuilder: (context, index) {
-          return Card(
-            elevation: 2,
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Image.network(
-                    retornaImagem(index),
-                    width: 140,
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ArtistPage(
+                      retornaImagem(index),
+                      retornaNome(index),
+                      retornaViews(index),
+                    ),
+                  ));
+            },
+            child: Card(
+              color: Colors.blueGrey[200],
+              elevation: 2,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 5,
                   ),
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          retornaNome(index),
-                        ),
-                      ],
-                    )),
-              ],
+                  Expanded(
+                    flex: 4,
+                    child: Image.network(
+                      retornaImagem(index),
+                      width: 140,
+                    ),
+                  ),
+                  Expanded(
+                      flex: 1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            retornaNome(index),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blueGrey[900],
+                            ),
+                          ),
+                        ],
+                      )),
+                ],
+              ),
             ),
           );
         }),
